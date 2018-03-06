@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require_relative './time-fetcher'
+
+tt = TrackingTime.new(
+    from: '2018-02-01',
+    to: '2018-02-29',
+)
+
+stk = Stockor.new
+
+tt.entries.each do |e|
+    entry = stk.post_entry(e)
+    unless entry['success']
+        pp e
+    end
+end

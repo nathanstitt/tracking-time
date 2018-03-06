@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require_relative './time-fetcher'
+tt = TrackingTime.new
+puts "#{tt.hours} logged #{tt.duration}"
