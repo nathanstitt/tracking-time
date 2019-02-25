@@ -8,17 +8,25 @@ class TrackingTime
 
     def initialize(query = {})
         @query = query
-        @query[:from] ||= Date.civil(Date.today.year, Date.today.month).strftime
-        @query[:to] ||= Date.civil(Date.today.year, Date.today.month+1, -1).strftime
+
+        month = (query[:months_ago].to_i || 0).months.ago
+        @query[:from] ||= month.beginning_of_month
+        @query[:to] ||= month.end_of_month #- 1.day
+
         @auth = { username: ENV['TT_LOGIN'], password: ENV['TT_PASSWORD'] }
     end
 
     def entries
-        self.class.get('/events', options)['data']
+        self.class.get('/events', options)['data'].map{|e| Entry.new(query, e) }
     end
 
     def hours
         (entries.sum{|e| e['duration']}.to_f / 60 / 60).round(2)
+    end
+
+    def expected_hours
+        to = query[:months_ago] ? query[:to] : (Date.today + 1.day)
+        query[:from].to_datetime.business_days_until(to) * 8
     end
 
     def duration

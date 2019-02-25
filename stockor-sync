@@ -2,16 +2,25 @@
 
 require_relative './time-fetcher'
 
+# if ARGV.empty?
+#     puts "need month ago arg"
+# end
+
 tt = TrackingTime.new(
-    from: '2018-02-01',
-    to: '2018-02-29',
+    months_ago: ARGV[0] || '1',
+    # from: Date.parse('2018-06-23').midnight,
+    # to: Date.parse('2018-07-31').midnight,
 )
 
 stk = Stockor.new
 
-tt.entries.each do |e|
-    entry = stk.post_entry(e)
+tt.entries.each do |ent|
+    puts ent.to_s
+    entry = stk.post_entry(ent)
     unless entry['success']
-        pp e
+        pp entry
     end
 end
+
+# 1787
+puts tt.hours
