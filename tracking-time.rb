@@ -12,8 +12,6 @@ class TrackingTime
         month = (query[:months_ago].to_i || 0).months.ago
         @query[:from] ||= month.beginning_of_month
         @query[:to] ||= month.end_of_month #- 1.day
-
-        @auth = { username: ENV['TT_LOGIN'], password: ENV['TT_PASSWORD'] }
     end
 
     def entries
@@ -35,10 +33,18 @@ class TrackingTime
 
     protected
 
+    def basic_auth
+        'Basic ' + Base64.encode64("#{ENV['TT_LOGIN']}:#{ENV['TT_PASSWORD']}")
+    end
+
     def options
         {
-            basic_auth: @auth,
-            headers: {"User-Agent" => 'TimeFetcher (nathan@stitt.org)'}, # TT docs say you have to include this
+            # basic_auth: @auth,
+         headers: {
+                   'User-Agent' => 'TimeFetcher (nathan@stitt.org)', # TT docs say you have to include this
+                   'Authorization' => basic_auth,
+         },
+
             query: query.merge({
                 filter: 'USER',
                 id: USER_ID,
